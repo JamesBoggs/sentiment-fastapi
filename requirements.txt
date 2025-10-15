@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 prometheus_client
 pydantic
+uvicorn[standard]
