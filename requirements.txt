@@ -1,5 +1,6 @@
 fastapi
-uvicorn[standard]
-prometheus_client
+uvicorn
 pydantic
-uvicorn[standard]
+torch
+transformers
+gdown
