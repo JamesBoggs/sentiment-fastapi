@@ -1,40 +1,30 @@
 import os
+
+# === Quantize once, then stop to prevent OOM ===
 if not os.path.exists("models/sentiment_quant.pt"):
     import quantize
-    exit()  # Prevent big model load this time
+    exit()  # prevent large model load on this run
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import os, torch, json, gdown
+import torch, json
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 # === App Setup ===
 app = FastAPI(title="Sentiment API", version="1.0.0")
-
-# === File Paths ===
-WEIGHT_PATH = "models/sentiment.pt"
-META_PATH = "models/sentiment_meta.json"
-GDRIVE_ID = "1iJ5CPcl4oNZ5Q8GD20QSDoVl2ROhNb7V"
-
-# === Download Model if Missing ===
-os.makedirs("models", exist_ok=True)
-if not os.path.exists(WEIGHT_PATH):
-    gdown.download(
-        f"https://drive.google.com/uc?id={GDRIVE_ID}",
-        WEIGHT_PATH,
-        quiet=False
-    )
 
 # === Load Tokenizer + Base ===
 base_model = "yiyanghkust/finbert-tone"
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 model = AutoModelForSequenceClassification.from_pretrained(base_model)
 
-# === Load Classification Head ===
-model.load_state_dict(torch.load(WEIGHT_PATH, map_location="cpu"))
+# === Load Quantized State ===
+state = torch.load("models/sentiment_quant.pt", map_location="cpu")
+model.load_state_dict(state)
 model.eval()
 
-# === Load Meta (for label mapping) ===
+# === Meta (optional) ===
+META_PATH = "models/sentiment_meta.json"
 try:
     with open(META_PATH) as f:
         meta = json.load(f)
