@@ -1,3 +1,8 @@
+import os
+if not os.path.exists("models/sentiment_quant.pt"):
+    import quantize
+    exit()  # Prevent big model load this time
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import os, torch, json, gdown
