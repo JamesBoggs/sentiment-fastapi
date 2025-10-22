@@ -1,0 +1,1 @@
+{"source": "financial_phrasebank", "model": "yiyanghkust/finbert-tone", "labels": ["negative", "neutral", "positive"]}
